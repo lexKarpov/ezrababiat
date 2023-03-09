@@ -3,9 +3,11 @@ import './FormSign.css';
 import { useForm } from "react-hook-form";
 import {regExpEmail} from '../../constants/constants.js'
 
-function Form({ submitRegisterForm }) {
+export default function Form({ submitRegisterForm }) {
   const location = useLocation();
   let buttonSubmit, redirect, redirectTo, desc, nameForm
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  watch('name')
 
   if (location.pathname === '/signin') {
     desc = 'Ещё не зарегистрированы?'
@@ -22,8 +24,7 @@ function Form({ submitRegisterForm }) {
     nameForm = 'signup'
   }
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
-  watch('name')
+
 
   function goSign(data) {
     submitRegisterForm(data, nameForm)
@@ -59,7 +60,7 @@ function Form({ submitRegisterForm }) {
                 required: 'это поле обязательно',
                 pattern: {
                   value: regExpEmail,
-                  message: 'это поле для емайла'
+                  message: 'это поле для email'
                 }
               })}
               className='label__input'/>
@@ -72,6 +73,10 @@ function Form({ submitRegisterForm }) {
             <input
               {...register("password", {
                 required: 'это поле обязательно',
+                minLength: {
+                  value: 6,
+                  message: "Пароль должен содержать не менее 6 символов"
+                },
               })}
               className='label__input'
               type='password'/>
@@ -87,4 +92,4 @@ function Form({ submitRegisterForm }) {
     </form >
   )
 }
-export default Form;
+

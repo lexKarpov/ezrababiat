@@ -2,13 +2,13 @@ import React, {useEffect, useState} from 'react'
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import './App.css';
 import {CurrentUserContext} from '../../contexts/CurrentUserContext'
-import Header from "../Header/Header";
 import Main from "../Main/Main";
 import Footer from "../Footer/Footer";
 import Register from "../Register/Register";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import Login from "../Login/Login";
 import EditProfile from "../EditProfile/EditProfile";
+import {authorize, createUser, testToken, verifyToken} from "../../utils/api";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({})
@@ -19,21 +19,29 @@ function App() {
       _id: '123',
     },
     {
-      _id: '123',
+      _id: '124',
     },
     {
-      _id: '123',
+      _id: '125',
     },
     {
-      _id: '123',
+      _id: '126',
     },
     {
-      _id: '123',
+      _id: '127',
     },
     {
-      _id: '123',
+      _id: '128',
     }
   ]
+
+  useEffect(_=> {
+    const jwt = localStorage.getItem('jwt')
+    // console.log(jwt)
+    // verifyToken(jwt)
+    // testToken(jwt)
+
+  })
 
   function changePageLogin(val) {
     setIsLogged(val)
@@ -44,17 +52,34 @@ function App() {
     navigate("/")
   }
 
+  function logIn(res, name) {
+    const {password, email} = res
+    return authorize({password, email})
+      .then(result => {
+        localStorage.setItem('jwt', result.user.accessToken)
+        navigate('/')
+        setIsLogged(true)
+        console.log(result.uid)
+        setCurrentUser({email: result.user.email , name: result.userData.name})
+      })
+      .catch(err => {
+        console.log(err)
+      })
+
+  }
+
   function submitRegisterForm(data, nameForm) {
-    console.log('I work!!!!!!!!!')
-    // nameForm === 'signup' ?
-    //   register(data)
-    //     .then(res => logIn(data))
-    //     .catch(err => {
-    //       console.log(err)
-    //       setIsSelectedImageTooltip(false)
-    //       setIsSelectedInfoTooltip(false)
-    //     }).finally(() => setPreloader(false))
-    //   : logIn(data)
+    nameForm === 'signup' ?
+      createUser(data)
+        .then(res => {
+          console.log(res)
+          console.log('success')
+          logIn(res)
+      })
+      :
+      logIn(data).then(res => {
+        console.log('success')
+      })
   }
 
   return (
@@ -82,9 +107,9 @@ function App() {
                   submitRegisterForm={submitRegisterForm}
                 />
               } />
-            <Route path="/saveFilms" element={
+            <Route path="/" element={
               <ProtectedRoute isLogged={isLogged}>
-                <Main/>
+                <Main cards={cards}/>
               </ProtectedRoute>
             }
             />
@@ -100,8 +125,6 @@ function App() {
               </ProtectedRoute>
             } />
           </Routes>
-          <Header/>
-          <Main cards={cards}/>
           <Footer/>
         </div>
       </div>
