@@ -1,0 +1,30 @@
+@import url(./vendor/normalize.css);
+
+@import url(./fonts/inter.css);
+#root{
+  width: 100%;
+}
+body {
+  background-color: #000;
+  font-family: Inter, Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  display: flex;
+  justify-content: center;
+  color: #fff;
+
+  width: 100%;
+}
+
+.content{
+  padding: 0 20px;
+  margin: 0 auto;
+  max-width: 1440px;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+

@@ -1,0 +1,41 @@
+.header {
+  display: flex;
+  padding: 30px 0;
+  /*grid-template-columns: max-content max-content max-content;*/
+  /*grid-template-rows: repeat(2, 50px);*/
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header__user {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: max-content;
+  gap: 10px
+}
+
+.header__button {
+  width: max-content;
+  height: 30px;
+  background-color: transparent;
+  color: white;
+}
+
+.header__navigation {
+  /*grid-column: 3/-1;*/
+  /*grid-row: 2/-1;*/
+}
+
+/*.header__button_type_addUser{*/
+/*    grid-column: 3/-1;*/
+/*    grid-row: 2/-1;*/
+/*}*/
+/*.header__button_type_addTask{*/
+/*    grid-column: 3/-1;*/
+/*    grid-row: 2/-1;*/
+/*}*/
+/*.header__button_type_addTask{*/
+/*    grid-column: 3/-1;*/
+/*    grid-row: 2/-1;*/
+/*}*/
