@@ -1,7 +1,12 @@
-import { initializeApp } from "firebase/app";
-import {getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, onAuthStateChanged  } from "firebase/auth";
-import {child, get, ref, set, getDatabase, onValue} from "firebase/database";
-import {logDOM} from "@testing-library/react";
+import {initializeApp} from "firebase/app";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithCustomToken,
+  onAuthStateChanged
+} from "firebase/auth";
+import {child, get, ref, set, getDatabase, update} from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDX6gPBIr1xUASo4gujWduzGyxunlN9Eoc",
@@ -14,25 +19,27 @@ const firebaseConfig = {
   serviceAccountId: 'my-client-id@my-project-id.iam.gserviceaccount.com',
 };
 
-const app = initializeApp (firebaseConfig);
-// let auth = getAuth ();
-const database = getDatabase ();
-const dbRef = ref (getDatabase ());
+const app = initializeApp(firebaseConfig);
+let auth = getAuth();
+const database = getDatabase();
+const dbRef = ref(getDatabase());
 const db = getDatabase();
 
 export function createUser({email, name, password}) {
-  return createUserWithEmailAndPassword(getAuth (), email, password)
+  const tasks = [
+    'lskdjf'
+  ]
+  return createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      const {uid, email, accessToken} = user
+      const {uid, email} = user
       return set(ref(db, `users/${uid}`), {
-        uid, name, email
+        uid, name, email, tasks
+      })
+        .then(res => {
+          return {name, email, uid, password, tasks}
         })
-          .then (res => {
-            console.log ('from current')
-            return {name, email, accessToken, uid, password}
-          })
-          .then (res => res)
+        .then(res => res)
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -43,17 +50,14 @@ export function createUser({email, name, password}) {
 
 export function authorize(data) {
   const {email, password} = data
-  return signInWithEmailAndPassword(getAuth (), email, password)
+  return signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
-      console.log(user)
       return user
     })
     .then(result => {
       return getUser(result.uid)
         .then(res => {
-          console.log(res)
-          console.log(result.stsTokenManager)
           return {
             user: result,
             userData: res,
@@ -69,46 +73,65 @@ export function authorize(data) {
 }
 
 function getUser(userId) {
-  return get (child (dbRef, `users/${userId}`)).then ((snapshot) => {
-    if (snapshot.exists ()) {
-      return (snapshot.val ())
+  return get(child(dbRef, `users/${userId}`)).then((snapshot) => {
+    if (snapshot.exists()) {
+      return (snapshot.val())
     } else {
-      console.log ("No data available");
+      console.log("No data available");
       return "noGetUser"
     }
-  }).catch ((error) => {
-    console.error (error);
+  }).catch((error) => {
+    console.error(error);
   });
 }
 
-export function verifyToken(token){
-  signInWithCustomToken(getAuth (), token)
-    .then((userCredential) => {
-      // Signed in
-      const user = userCredential.user;
-      console.log('yeah!')
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log('no')
-    });
+export function writeGoodTask(title, uid) {
+  const db = getDatabase();
+  let newList = []
+  return getUser(uid)
+    .then(res => res.tasks)
+    .then(task => {
+      newList = [...task, title]
+      return update(ref(db, 'users/' + uid), {
+        tasks: [...task, title],
+      })
+    }).then(_=> newList)
 }
 
-export function testToken(uid) {
-  console.log('lsdkfjsdlfj')
-  const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      const uid = user.uid;
-      console.log('sdfsdf')
-    } else {
-      // User is signed out
-      console.log('errr')
+export function updateProfile(uid, name, email) {
+  return update(ref(db, 'users/' + uid), {
+    name,
+    email,
+  }).then(_ => {
+    return {
+      name,
+      email,
+      uid
     }
+  })
+}
+
+export function deleteCard(newArr, uid) {
+  return update(ref(db, 'users/' + uid), {
+    tasks: newArr
+  }).then(_ => {
+    return {
+      newArr
+    }
+  })
+}
+
+
+export function getAllUsers() {
+  return get(child(dbRef, `users/`)).then((snapshot) => {
+    if (snapshot.exists()) {
+      return (snapshot.val())
+    } else {
+      return "noGetUsers"
+    }
+  }).catch((error) => {
+    console.error(error);
   });
 }
 
-testToken('7VuJUZH58ObzkPd5SzRriu1uEo83')
+

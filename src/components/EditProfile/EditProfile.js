@@ -70,7 +70,7 @@ function EditProfile({logOut, isLogged, pageLogin, updateUser}) {
                     required: 'это поле обязательно',
                     pattern: {
                       value: regExpEmail,
-                      message: 'это поле для емайла'
+                      message: 'это поле для email'
                     }
                   })}/>
               </label>
@@ -81,8 +81,11 @@ function EditProfile({logOut, isLogged, pageLogin, updateUser}) {
                   <button type='submit' className="editProfile__button">Сохранить</button>}
               </div>
             </form>
-            {isEdit ? <button type="button" className="editProfile__button editProfile__button_type_edit"
-                              onClick={editProfile}>Редактировать</button>
+            {isEdit ?
+              <button
+                type="button"
+                className="editProfile__button editProfile__button_type_edit"
+                onClick={editProfile}>Редактировать</button>
               : null
             }
             <button type="button" className="editProfile__button editProfile__button_color_red" onClick={logOut}>Выйти
@@ -91,8 +94,6 @@ function EditProfile({logOut, isLogged, pageLogin, updateUser}) {
           </div>
         </section>
       </main>
-
-      }
     </div>
 
   )

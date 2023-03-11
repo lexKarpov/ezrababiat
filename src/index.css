@@ -27,4 +27,8 @@ body {
   justify-content: space-between;
 }
 
-
+.ellipsis{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

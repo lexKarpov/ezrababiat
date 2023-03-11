@@ -8,72 +8,77 @@ import Register from "../Register/Register";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import Login from "../Login/Login";
 import EditProfile from "../EditProfile/EditProfile";
-import {authorize, createUser, testToken, verifyToken} from "../../utils/api";
+import {authorize, createUser, deleteCard, updateProfile, writeGoodTask} from "../../utils/api";
+import SearchFriend from "../SearchFriend/SearchFriend";
+import AddTask from "../AddTask/AddTask";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({})
   let navigate = useNavigate();
   const [isLogged, setIsLogged] = useState(false)
-  const cards = [
-    {
-      _id: '123',
-    },
-    {
-      _id: '124',
-    },
-    {
-      _id: '125',
-    },
-    {
-      _id: '126',
-    },
-    {
-      _id: '127',
-    },
-    {
-      _id: '128',
-    }
-  ]
 
-  useEffect(_=> {
-    const jwt = localStorage.getItem('jwt')
-    // console.log(jwt)
-    // verifyToken(jwt)
-    // testToken(jwt)
-
-  })
 
   function changePageLogin(val) {
     setIsLogged(val)
   }
   function logOut() {
-    localStorage.clear()
     setIsLogged(false)
-    navigate("/")
+    navigate("/signup")
   }
 
-  function logIn(res, name) {
-    const {password, email} = res
+  function writeTask({title}){
+    writeGoodTask(title, currentUser.uid, currentUser.tasks).then(taskList => {
+      setCurrentUser({
+        ...currentUser,
+        tasks:taskList
+      })
+      navigate("/")
+    })
+  }
+
+  function editCard(cardId) {
+    // const newList = currentUser.tasks.map((el, index) => inde)
+  }
+
+
+  function updateUser(data) {
+    return updateProfile(currentUser.uid, data.name, data.email)
+      .then(res => {
+        setCurrentUser({
+          ...currentUser,
+          name: res.name,
+          email: res.email
+        })
+        navigate("/")
+      })
+  }
+
+  function logIn(res) {
+    const {password, email, uid} = res
     return authorize({password, email})
       .then(result => {
-        localStorage.setItem('jwt', result.user.accessToken)
         navigate('/')
         setIsLogged(true)
-        console.log(result.uid)
-        setCurrentUser({email: result.user.email , name: result.userData.name})
+        setCurrentUser({email: result.user.email , name: result.userData.name, uid, tasks: result.userData.tasks})
       })
       .catch(err => {
         console.log(err)
       })
+  }
 
+  function onCardDelete(cardId) {
+    const newList = currentUser.tasks.filter((el, index) => index !== cardId )
+    deleteCard(newList, currentUser.uid)
+    setCurrentUser({
+      ...currentUser,
+      tasks: newList
+    })
   }
 
   function submitRegisterForm(data, nameForm) {
     nameForm === 'signup' ?
       createUser(data)
         .then(res => {
-          console.log(res)
-          console.log('success')
           logIn(res)
       })
       :
@@ -109,7 +114,10 @@ function App() {
               } />
             <Route path="/" element={
               <ProtectedRoute isLogged={isLogged}>
-                <Main cards={cards}/>
+                <Main
+                  cards={currentUser.tasks}
+                  onCardDelete={onCardDelete}
+                  editCard={editCard}/>
               </ProtectedRoute>
             }
             />
@@ -120,7 +128,27 @@ function App() {
                   isLogged={isLogged}
                   pageLogin={changePageLogin}
                   logOut={logOut}
-                  // updateUser={updateUser}
+                  updateUser={updateUser}
+                />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/search" element={
+              <ProtectedRoute isLogged={isLogged}>
+                <SearchFriend
+                  isLogged={isLogged}
+                  pageLogin={changePageLogin}
+                />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/addTask" element={
+              <ProtectedRoute isLogged={isLogged}>
+                <AddTask
+                  isLogged={isLogged}
+                  pageLogin={changePageLogin}
+                  logOut={logOut}
+                  writeTask={writeTask}
                 />
               </ProtectedRoute>
             } />

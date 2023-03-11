@@ -17,16 +17,16 @@ function Header({isLogged, name}) {
         isLogged ?
           <>
             <nav className="header__navigation">
-              <button className="header__button header__button_type_addUser">Найти пользователя</button>
-              <button className="header__button header__button_type_addTask">Добавить доброе дело</button>
-              <button className="header__button header__button_type_addTask">Друзья</button>
+              <Link to="/search" className="header__button header__button_type_addUser">Найти пользователя</Link>
+              <Link to="/addTask" className="header__button header__button_type_addTask">Добавить доброе дело</Link>
+              <Link to="/search" className="header__button header__button_type_addTask">Друзья</Link>
             </nav>
-            <div className="header__user">
+            <Link className="header__user" to="/editProfile">
               <p className="header__userName">{name}</p>
               <PersonCircle
                 color="white"
                 size={30}/>
-            </div>
+            </Link>
           </>
         :
         null
