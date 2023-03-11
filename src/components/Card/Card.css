@@ -1,0 +1,41 @@
+.card{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #000;
+  margin: 0 auto;
+  width: 300px;
+  position: relative;
+  box-shadow: 2px 2px 7px rgba(154, 147, 140, 0.5), 2px 2px 15px rgba(255, 255, 255, 1);
+}
+
+.card__action{
+  list-style-type: none;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  padding: 0;
+}
+
+.card__button{
+
+
+}
+
+.card__button:hover{
+  cursor: pointer;
+}
+
+.card__title{
+  font-size: 20px;
+  margin: 0;
+  max-width: 100%;
+}
+
+.card__description{
+  /*max-width: 200px;*/
+}
