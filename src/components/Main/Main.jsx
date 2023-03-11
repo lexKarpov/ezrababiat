@@ -4,7 +4,7 @@ import {CurrentUserContext} from "../../contexts/CurrentUserContext";
 import Card from "../Card/Card";
 import Header from "../Header/Header";
 
-export default function Main({onCardDelete, editCard}) {
+export default function Main({onCardDelete, editCard, navigate}) {
   const currentUser = React.useContext(CurrentUserContext)
 
   return (
@@ -17,6 +17,7 @@ export default function Main({onCardDelete, editCard}) {
                   onCardDelete = {onCardDelete}
                   index={index}
                   editCard={editCard}
+                  navigate={navigate}
             />
           )}
       </ul>

@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react'
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import React, {useState} from 'react'
+import {Routes, Route, useNavigate, useLocation} from "react-router-dom";
 import './App.css';
 import {CurrentUserContext} from '../../contexts/CurrentUserContext'
 import Main from "../Main/Main";
@@ -8,38 +8,56 @@ import Register from "../Register/Register";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import Login from "../Login/Login";
 import EditProfile from "../EditProfile/EditProfile";
-import {authorize, createUser, deleteCard, updateProfile, writeGoodTask} from "../../utils/api";
+import {
+  addFriend,
+  authorize,
+  createUser,
+  deleteCard,
+  getAllUsers,
+  updateProfile,
+  updateTask,
+  writeGoodTask
+} from "../../utils/api";
 import SearchFriend from "../SearchFriend/SearchFriend";
 import AddTask from "../AddTask/AddTask";
+import EditTask from "../EditTask/EditTask";
+import Friends from "../Friends/Friends";
 
 function App() {
   const [currentUser, setCurrentUser] = useState({})
   let navigate = useNavigate();
   const [isLogged, setIsLogged] = useState(false)
 
-
   function changePageLogin(val) {
     setIsLogged(val)
   }
+
   function logOut() {
     setIsLogged(false)
     navigate("/signup")
   }
 
-  function writeTask({title}){
+  function writeTask({title}) {
     writeGoodTask(title, currentUser.uid, currentUser.tasks).then(taskList => {
       setCurrentUser({
         ...currentUser,
-        tasks:taskList
+        tasks: taskList
       })
       navigate("/")
     })
   }
 
-  function editCard(cardId) {
-    // const newList = currentUser.tasks.map((el, index) => inde)
+  function editCard({title}, cardId) {
+    const newList = currentUser.tasks.map((el, index) => index === cardId ? el = title : el)
+    updateTask(newList, currentUser.uid)
+      .then(_ => {
+        setCurrentUser({
+          ...currentUser,
+          tasks: newList
+        })
+        navigate("/")
+      })
   }
-
 
   function updateUser(data) {
     return updateProfile(currentUser.uid, data.name, data.email)
@@ -59,7 +77,7 @@ function App() {
       .then(result => {
         navigate('/')
         setIsLogged(true)
-        setCurrentUser({email: result.user.email , name: result.userData.name, uid, tasks: result.userData.tasks})
+        setCurrentUser({email: result.user.email, name: result.userData.name, uid, tasks: result.userData.tasks, friends: result.userData.friends})
       })
       .catch(err => {
         console.log(err)
@@ -67,12 +85,29 @@ function App() {
   }
 
   function onCardDelete(cardId) {
-    const newList = currentUser.tasks.filter((el, index) => index !== cardId )
+    const newList = currentUser.tasks.filter((el, index) => index !== cardId)
     deleteCard(newList, currentUser.uid)
-    setCurrentUser({
-      ...currentUser,
-      tasks: newList
-    })
+      .then(_=> {
+        setCurrentUser({
+          ...currentUser,
+          tasks: newList
+        })
+      })
+  }
+
+  function addUser({name, tasks}) {
+    console.log('tasks')
+    console.log(tasks)
+    addFriend(name, tasks, currentUser.uid)
+      .then(res =>
+      {
+        setCurrentUser({
+          ...currentUser,
+          friends: [...currentUser.friends, {name, tasks}]
+        })
+        navigate("/")
+      }
+  )
   }
 
   function submitRegisterForm(data, nameForm) {
@@ -80,7 +115,7 @@ function App() {
       createUser(data)
         .then(res => {
           logIn(res)
-      })
+        })
       :
       logIn(data).then(res => {
         console.log('success')
@@ -111,13 +146,15 @@ function App() {
                   pageLogin={changePageLogin}
                   submitRegisterForm={submitRegisterForm}
                 />
-              } />
+              }/>
             <Route path="/" element={
               <ProtectedRoute isLogged={isLogged}>
                 <Main
                   cards={currentUser.tasks}
                   onCardDelete={onCardDelete}
-                  editCard={editCard}/>
+                  editCard={editCard}
+                  navigate={navigate}
+                />
               </ProtectedRoute>
             }
             />
@@ -131,16 +168,17 @@ function App() {
                   updateUser={updateUser}
                 />
               </ProtectedRoute>
-            } />
+            }/>
 
             <Route path="/search" element={
               <ProtectedRoute isLogged={isLogged}>
                 <SearchFriend
                   isLogged={isLogged}
                   pageLogin={changePageLogin}
+                  addUser={addUser}
                 />
               </ProtectedRoute>
-            } />
+            }/>
 
             <Route path="/addTask" element={
               <ProtectedRoute isLogged={isLogged}>
@@ -151,7 +189,28 @@ function App() {
                   writeTask={writeTask}
                 />
               </ProtectedRoute>
-            } />
+            }/>
+
+            <Route path="/editTask/:id" element={
+              <ProtectedRoute isLogged={isLogged}>
+                <EditTask
+                  isLogged={isLogged}
+                  pageLogin={changePageLogin}
+                  editCard={editCard}
+                />
+              </ProtectedRoute>
+            }/>
+
+            <Route path="/friends" element={
+              <ProtectedRoute isLogged={isLogged}>
+                <Friends
+                  cards={currentUser.friends}
+                  onCardDelete={onCardDelete}
+                  editCard={editCard}
+                  navigate={navigate}
+                />
+              </ProtectedRoute>
+            }/>
           </Routes>
           <Footer/>
         </div>

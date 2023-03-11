@@ -35,7 +35,7 @@ function EditProfile({logOut, isLogged, pageLogin, updateUser}) {
 
   return (
     <div className="editProfile__container">
-      <Header isLog={isLogged} pageLogin={pageLogin}/>
+      <Header isLogged={isLogged} pageLogin={pageLogin}/>
       <main>
         <section className="editProfile">
           <div className="editProfile__wrapper">

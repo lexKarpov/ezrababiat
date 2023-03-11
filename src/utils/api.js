@@ -29,15 +29,16 @@ export function createUser({email, name, password}) {
   const tasks = [
     'lskdjf'
   ]
+  const friends = [{name: 'alex', tasks: ['good']}]
   return createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
       const {uid, email} = user
       return set(ref(db, `users/${uid}`), {
-        uid, name, email, tasks
+        uid, name, email, tasks, friends
       })
         .then(res => {
-          return {name, email, uid, password, tasks}
+          return {name, email, uid, password, tasks, friends}
         })
         .then(res => res)
     })
@@ -86,7 +87,6 @@ function getUser(userId) {
 }
 
 export function writeGoodTask(title, uid) {
-  const db = getDatabase();
   let newList = []
   return getUser(uid)
     .then(res => res.tasks)
@@ -96,6 +96,24 @@ export function writeGoodTask(title, uid) {
         tasks: [...task, title],
       })
     }).then(_=> newList)
+}
+
+export function updateTask(list, uid) {
+  return getUser(uid)
+    .then( _=> {
+      return update(ref(db, 'users/' + uid), {
+        tasks: list,
+      })
+    })
+}
+
+export function addFriend(name, tasks, uid) {
+  return getUser(uid)
+    .then( user => {
+      return update(ref(db, 'users/' + uid), {
+        friends: [...user.friends, {name, tasks}],
+      })
+    })
 }
 
 export function updateProfile(uid, name, email) {

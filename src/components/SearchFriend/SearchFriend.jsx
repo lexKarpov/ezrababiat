@@ -3,9 +3,16 @@ import './SearchFriend.css'
 import Header from '../Header/Header';
 import {useForm} from "react-hook-form";
 import {regExpEmail} from '../../constants/constants.js'
+import InfoTooltip from "../InfoTool/InfoTool";
+import {getAllUsers} from "../../utils/api";
 
-
-export default function SearchFriend({logOut, isLogged, pageLogin, updateUser}) {
+export default function SearchFriend({isLogged, addUser}) {
+  const [isOpen, setisOpen] = useState(false)
+  const [data, setData] = useState(null)
+  const [allUsers, setAllUsers] = useState(null)
+  useEffect(()=>{
+    getAllUsers().then(res => setAllUsers(res))
+  })
 
   const {register, handleSubmit, watch, formState: {errors}} = useForm(
     {
@@ -17,12 +24,23 @@ export default function SearchFriend({logOut, isLogged, pageLogin, updateUser}) 
   watch('email')
 
   function submitEditProfile({email}) {
-    console.log(email)
+    setisOpen(true)
+    let user
+    for (const resKey in allUsers) {
+      if(allUsers[resKey].email === email){
+        user = allUsers[resKey]
+      }
+    }
+    setData(user)
+  }
+
+  function onClose() {
+    setisOpen(false)
   }
 
   return (
     <div className="editProfile__container">
-      <Header isLog={isLogged} pageLogin={pageLogin}/>
+      <Header isLogged={isLogged}/>
       <main>
         <section className="search">
           <div className="search__wrapper">
@@ -48,10 +66,9 @@ export default function SearchFriend({logOut, isLogged, pageLogin, updateUser}) 
               </div>
             </form>
           </div>
+          <InfoTooltip isOpen={isOpen} onClose={onClose} data={data} addUser={addUser}/>
         </section>
       </main>
     </div>
-
   )
 }
-
