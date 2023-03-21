@@ -3,9 +3,8 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithCustomToken,
-  onAuthStateChanged
 } from "firebase/auth";
+
 import {child, get, ref, set, getDatabase, update} from "firebase/database";
 
 const firebaseConfig = {
@@ -27,7 +26,7 @@ const db = getDatabase();
 
 export function createUser({email, name, password}) {
   const tasks = [
-    'lskdjf'
+    'good task 1'
   ]
   const friends = [{name: 'alex', tasks: ['good']}]
   return createUserWithEmailAndPassword(auth, email, password)

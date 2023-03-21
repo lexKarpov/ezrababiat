@@ -34,6 +34,7 @@ function App() {
 
   function logOut() {
     setIsLogged(false)
+    setCurrentUser({})
     navigate("/signup")
   }
 
@@ -80,7 +81,8 @@ function App() {
         setCurrentUser({email: result.user.email, name: result.userData.name, uid, tasks: result.userData.tasks, friends: result.userData.friends})
       })
       .catch(err => {
-        console.log(err)
+        alert('неверные данные')
+        navigate('/signin')
       })
   }
 
@@ -115,11 +117,11 @@ function App() {
       createUser(data)
         .then(res => {
           logIn(res)
+            .catch(err => console.log(err))
         })
+        .catch(err => console.log(err))
       :
-      logIn(data).then(res => {
-        console.log('success')
-      })
+      logIn(data)
   }
 
   return (
